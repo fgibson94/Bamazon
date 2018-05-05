@@ -1,17 +1,22 @@
-//add column isSelected BOOLEAN to database 
-var inquirer = require('inquirer'); 
-var mysql = require('mysql');  
+var mysql = require('mysql');
+// create the connection information for the sql database
 var connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'bamazon_db'
-});   
+    host: "localhost",
+    port: 3306,
 
-//create- 
-    connection.connect(); 
-    connection.query('SELECT *  FROM products', function (error, results, fields) {
-        console.log(results) });  
+    // Your username
+    user: "testuser",
+
+    // Your password
+    password: "",
+    database: "bamazon_db"
+});
+
+//create- 
+connection.connect();
+connection.query('SELECT *  FROM products', function (error, results, fields) {
+    console.log(results)
+});  
 
 //Read- Prompt user to pick purchase inquirer checkbox choices from showInventory();
 inquirer.prompt([/* Show options to buy */]).then(answers => {    
