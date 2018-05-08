@@ -16,9 +16,11 @@ var connection = mysql.createConnection({
 
 //create- 
 connection.connect();
+
 function showInventory() {
 
-    connection.query('SELECT *  FROM products', function (error, results, fields) {
+    connection.query('SELECT *  FROM products', function (error, results) {
+        if (error) throw error;
         //console.log(results)
         console.log("===========================================")
         for (var i = 0; i < results.length; i++) {
@@ -32,41 +34,47 @@ function showInventory() {
         }
         console.log("===========================================")
     });
-
 };
+
+showInventory();
+
+//Takes Items from Inventory for Prompt
+
 var choicesArray = [];
 
 function selectedChoices() {
-    connection.query('SELECT *  FROM products', function (error, results, fields) {
+    connection.query('SELECT *  FROM products', function (error, results) {
         if (error) throw error;
-        console.log("===========================================")
         results.forEach(item => {
             choicesArray.push(item.product_name)
-
         });
-        console.log(choicesArray)
-        console.log("===========================================")
-
+        //console.log(choicesArray)
+        choicesPrompt();
     });
 
 };
 
-//selectedChoices();
-
 //First Prompt to Allow User to Pick Items to purchase
+function choicesPrompt() {
+    inquirer.prompt([
+        {
+            type: 'checkbox',
+            name: 'shopList',
+            message: 'What are you purchasing?',
+            choices: choicesArray
+        }
 
-inquirer.prompt([
-    {
-        type: 'checkbox',
-        name: 'shopList',
-        message: 'What are you purchasing?',
-        choices: choicesArray
-    }
+    ])
+        .then(answers => {
+            console.log(
+                `
+            Cart: ${answers.shopList}
+                `
+            )
+        });
+}
 
-])
-    .then(answers => {
-        console.log( JSON.stringify(answers.shopList))
-    });
+//selectedChoices();
 
 
 // //Show page confirming purchases
