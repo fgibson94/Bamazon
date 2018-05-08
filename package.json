@@ -4,8 +4,8 @@
   "description": "Amazon like store front combining JS, Node.JS and MySQL",
   "main": "index.js",
   "dependencies": {
-    "mysql": "^2.15.0",
-    "inquirer": "^5.2.0"
+    "inquirer": "^5.2.0",
+    "mysql": "^2.15.0"
   },
   "devDependencies": {},
   "scripts": {
