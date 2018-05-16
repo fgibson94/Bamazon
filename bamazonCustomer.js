@@ -39,16 +39,38 @@ function showInventory() {
 showInventory();
 
 //Takes Items from Inventory for Prompt
-
-var choicesArray = [];
+var data= [];
+var dataID;
 
 function selectedChoices() {
-    connection.query('SELECT *  FROM products', function (error, results) {
+    connection.query('SELECT item_id, product_name, stock_quantity  FROM products', function (error, results) {
         if (error) throw error;
-        results.forEach(item => {
-            choicesArray.push(item.product_name)
+        //console.log(results)
+        results.map(result => {
+            data.push( {
+                item_id: result.item_id,
+                stock_quantity: result.stock_quantity,
+            })
+        })
+        
+        console.log("data", data)
+
+        dataID = data.map(element => {
+            console.log("dataID", element.item_id)
         });
-        //console.log(choicesArray)
+
+        var dataStock =data.forEach(element => {
+            console.log("dataStock", element.stock_quantity)
+        });
+
+
+        var product = data.find(p => p.item_id === 1);
+        console.log("product", product)
+
+        //ShopList choices
+        
+
+        
         choicesPrompt();
     });
 
@@ -61,79 +83,78 @@ function choicesPrompt() {
             type: 'checkbox',
             name: 'shopList',
             message: 'What are you purchasing?',
-            choices: choicesArray
+            choices: 
         }
 
     ])
         .then(answers => {
-            console.log(
-                `
-            Cart: ${answers.shopList}
-                `
-            )
+            console.log("answers.shoplist", answers.shopList)
+            // var cart = answers.shopList.find(p => p.item === answers.shopList.item)
+            console.log('You have in your Cart: \n')
+
+            answers.shopList.forEach(item => {
+                console.log(`Item ID:${item}\n`)
+
+            })
+            //Checks quantity of stock of selectedChoices
+
+            function quantityPrompt() {
+                //Second prompt for Quantity Check
+                var count = 0;
+                //value to match stock quantity
+                
+
+                if (count < answers.shopList.length) {
+
+                    inquirer.prompt([
+                        {
+                            type: 'input',
+                            name: 'howMany',
+                            message: 'How many would you like to purchase?',
+                            validate: function (value) {
+                                var pass = value.match(
+                                    /\d/gm
+                                );
+                                if (pass) {
+                                    //check quantity
+                                    if (Number(value) < 15 ) {
+                                        console.log('Sufficient Quanity purchase made')
+                                    return true;
+                                    }
+                                    else {
+                                        console.log('\nInsufficient Quantity, Please Change Your Quantity')
+                                    return false;
+                                    }
+
+                                }
+                                console.log("Please enter a valid number")
+                                return false;
+                            }
+                        }
+                    ])
+                        .then(answers => {
+                            console.log(answers)
+                            count++;
+                            console.log(count)
+                            quantityPrompt();
+                        })
+                }
+            }
+            quantityPrompt();
+
         });
 }
 
-//selectedChoices();
+selectedChoices();
 
+function updateChoices() {
+    connection.query('UPDATE stock_quantity FROM products WHERE item_id =? ', function (error, results) {
+        if (error) throw error;
+        //console.log(results)
+        //command to subtract quantity from purchased amounts
+        //showInventory();
+    });
 
-// //Show page confirming purchases
-// function showCart() {
-//     connection.query('SELECT * FROM products WHERE isSelected = true', function (error, results, fields) {
-//         if (error) throw error;
-//         for (var i = 0; i < results.length; i++) {
+};
 
-//             console.log(//results[i].id + "|" + results[i].title + "|" + results[i].price + "|" + results[i].quantity)
-//                 console.log("===========================================")
-//             )
-//         };
-//     });
-// };
-
-// //Prompt continue shopping or checkout inquirer confirm ready to checkout or continue shopping;    
-// inquirer
-//     .prompt([
-//         {
-//             type: 'confirm',
-//             name: 'checkout',
-//             message: 'Would you like to checkout?'
-//         }
-//     ])
-//     .then(answers => {
-//         if (answers.checkout === true) {
-//             //1.showPurchases();//Update/Delete- checkout shows receipt
-//             console.log("purchase made")
-//         } else {
-//             //Cnt shopping returns to prev page
-//             //2.showInventory();
-//             console.log("keep shopping")
-//         }
-
-//     })
-
-
-// function showPurchase() {
-//     showCart();
-//     console.log("purchases made");
-//     //Decrease items quantity  
-//     connection.query('UPDATE * FROM products DELETE quantity WHERE isSelected = true', function (error, results, fields) {
-//         if (error) throw error;
-//         showNewInventory();
-//     }
-//     );
-// };
-
-// //Update- shows shopping updated inventory
-// function showNewInventory() {
-//     connection.query('SELECT * FROM products'), function (error, results, fields) {
-//         if (error) throw error;
-//         for (var i = 0; i < results.length; i++) {
-//             //inquirer(prompt)
-//             console.log(//results[i].id + "|" + results[i].title + "|" + results[i].price + "|" + results[i].quantity)
-//                 console.log("===========================================")
-//             )
-//         };
-//     };
-// };
-//Prompt another purchase?
  connection.end(); 
