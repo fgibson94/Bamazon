@@ -83,7 +83,7 @@ function choicesPrompt() {
             type: 'checkbox',
             name: 'shopList',
             message: 'What are you purchasing?',
-            choices: 
+            choices: something
         }
 
     ])
